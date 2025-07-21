@@ -71,13 +71,29 @@
     function getContext() {
     }
 
+    // async function getUserProfile() {
+    //   const profile = await liff.getProfile()
+    //   document.getElementById("pictureUrl").src = profile.pictureUrl
+    //   document.getElementById("userId").append(profile.userId)
+    //   document.getElementById("statusMessage").append(profile.statusMessage)
+    //   document.getElementById("displayName").append(profile.displayName)
+    // }
+
     async function getUserProfile() {
-      const profile = await liff.getProfile()
+  try {
+    const profile = await liff.getProfile()
+    if (profile.pictureUrl) {
       document.getElementById("pictureUrl").src = profile.pictureUrl
-      document.getElementById("userId").append(profile.userId)
-      document.getElementById("displayName").append(profile.displayName)
-      document.getElementById("statusMessage").append(profile.statusMessage)
     }
+    document.getElementById("userId").append(profile.userId || "")
+    document.getElementById("statusMessage").append(profile.statusMessage || "")
+    document.getElementById("displayName").append(profile.displayName || "")
+  } catch (err) {
+    console.error("getUserProfile error:", err)
+    alert("เกิดข้อผิดพลาดในการโหลดโปรไฟล์: " + err.message)
+  }
+}
+
 
     function getEnvironment() {
     document.getElementById("os").append(liff.getOS())
@@ -94,14 +110,19 @@
      }
 }
 
-    async function main() {
-      await liff.init({ liffId: "2007663287-qzrQDZQ9" })
-      getEnvironment()
-      getUserProfile()
-      // getContext()
-      // getFriendship()
-      // createUniversalLink()
-    }
+async function main() {
+  await liff.init({ liffId: "2007663287-qzrQDZQ9" })
+
+  // เช็กก่อนว่าล็อกอินหรือยัง
+  if (!liff.isLoggedIn()) {
+    liff.login()
+    return
+  }
+
+  getEnvironment()
+  getUserProfile()
+}
+
     main()
   </script>
 </body>
